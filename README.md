@@ -37,7 +37,6 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            overflow: pointer;
             pointer-events: none;
         }
         .bubble {
@@ -65,15 +64,26 @@
             align-items: center;
         }
 
-        .logo {
-            font-family: 'Fredoka', cursive;
-            font-size: 28px;
-            color: var(--primary);
-            text-decoration: none;
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-            text-shadow: 2px 2px 0px var(--primary-light);
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(255,158,187,0.3);
+        }
+
+        .logo-text {
+            font-family: 'Fredoka', cursive;
+            font-size: 26px;
+            color: var(--primary);
+            text-shadow: 1px 1px 0px var(--primary-light);
         }
 
         .nav-icons {
@@ -103,23 +113,37 @@
             color: white;
         }
 
-        /* Hero sekcja */
+        /* Hero sekcja z logo */
         .hero {
             text-align: center;
-            padding: 50px 20px;
+            padding: 40px 20px;
             max-width: 800px;
             margin: 0 auto;
         }
 
+        .hero-main-logo {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 15px rgba(177, 156, 217, 0.3));
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
         .hero h1 {
             font-family: 'Fredoka', cursive;
-            font-size: 42px;
+            font-size: 38px;
             color: var(--secondary);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .hero p {
-            font-size: 18px;
+            font-size: 17px;
             color: #7a6e7d;
             margin-bottom: 25px;
         }
@@ -183,11 +207,23 @@
             transform: scale(0.95);
         }
 
+        .spin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
         .prize-alert {
             margin-top: 15px;
             font-weight: 700;
             color: #6b4c7a;
             min-height: 24px;
+        }
+
+        .attempts-counter {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
         }
 
         /* Sklep - Filtry i Produkty */
@@ -459,7 +495,7 @@
             box-shadow: 0 4px 15px rgba(255, 158, 187, 0.4);
         }
 
-        /* Kontakt i Social Media */
+        /* Stopka / Kontakt / Social Media */
         footer {
             background: white;
             border-top: 2px solid var(--primary-light);
@@ -527,28 +563,33 @@
     <div class="bubbles" id="bubblesContainer"></div>
 
     <header>
-        <a href="#" class="logo">🧸 Gniotkomat</a>
+        <a href="#" class="logo-container">
+            <img src="https://i.ibb.co/6R2B4z3/logo.png" class="logo-img" alt="Gniotkomat Logo" onerror="this.src='https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=100&q=80'">
+            <span class="logo-text">Gniotkomat</span>
+        </a>
         <div class="nav-icons">
-            <button class="machine-nav-btn" onclick="scrollToMachine()">🎰 Wylosuj rabat</button>
+            <button class="machine-nav-btn" onclick="scrollToMachine()">🎰 Gniotkomat</button>
             <button class="cart-btn" onclick="toggleCart()">🛒 Koszyk (<span id="cartCount">0</span>)</button>
         </div>
     </header>
 
     <section class="hero">
+        <img src="https://i.ibb.co/6R2B4z3/logo.png" class="hero-main-logo" alt="Gniotkomat Główne Logo" onerror="this.style.display='none'">
         <h1>Wydźwiękaj swój stres! 🌸</h1>
         <p>Najsłodsze, super mięciutkie gniotki Mochi, zwierzaki i gniotki giganty czekają na Ciebie!</p>
     </section>
 
-    <!-- Gniotkomat Maszyna -->
+    <!-- Gniotkomat Maszyna z limitem 3 prób i szansą 1/30 -->
     <div class="container">
         <div class="gniotkomat-section" id="gniotkomatSection">
             <h2>✨ Gniotkomat Szczęścia ✨</h2>
-            <p>Zakręć maszyną i wygraj tajny kod zniżkowy lub darmową dostawę!</p>
+            <p>Zakręć maszyną! Masz łącznie 3 próby na wylosowanie zniżki lub darmowej dostawy.</p>
             <div class="machine-box">
                 <div class="drum" id="drumEmoji">🐱 🐰 🐼 🦄</div>
                 <div class="prize-alert" id="prizeAlert">Kliknij przycisk poniżej, aby losować!</div>
+                <div class="attempts-counter" id="attemptsCounter">Pozostałe próby: 3 / 3</div>
             </div>
-            <button class="spin-btn" onclick="spinMachine()">KRCĘ MASZYNĄ! 🎰</button>
+            <button class="spin-btn" id="spinBtn" onclick="spinMachine()">KRĘĆ MASZYNĄ! 🎰</button>
         </div>
 
         <!-- Filtry i Produkty -->
@@ -613,7 +654,7 @@
     </footer>
 
     <script>
-        // BAZA PRODUKTÓW - TUTAJ MOŻESZ DODAWAĆ I EDYTOWAĆ GNIOTKI Z IPADA!
+        // BAZA PRODUKTÓW - TUTAJ MOŽESZ DODAWAĆ I EDYTOWAĆ GNIOTKI!
         const products = [
             {
                 id: 1,
@@ -678,9 +719,31 @@
         ];
 
         let cart = [];
-        let currentDiscount = 0; // w procentach
+        let currentDiscount = 0; 
         let freeShipping = false;
-        let spinCount = 0;
+        
+        // System limitu 3 prób na użytkownika (zapisywany w przeglądarce)
+        let userAttempts = parseInt(localStorage.getItem('gniotkomat_attempts') || '0');
+        const maxAttempts = 3;
+
+        // Inicjalizacja licznika prób przy starcie
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAttemptsUI();
+        });
+
+        function updateAttemptsUI() {
+            const counterEl = document.getElementById('attemptsCounter');
+            const btn = document.getElementById('spinBtn');
+            const remaining = maxAttempts - userAttempts;
+            
+            if(remaining > 0) {
+                counterEl.innerHTML = `Pozostałe próby: ${remaining} / ${maxAttempts}`;
+            } else {
+                counterEl.innerHTML = `Wykorzystano wszystkie próby (3/3) 🥺`;
+                btn.disabled = true;
+                btn.textContent = "BRAK PRÓB 🚫";
+            }
+        }
 
         // Generowanie bąbelków tła
         const bubblesContainer = document.getElementById('bubblesContainer');
@@ -743,28 +806,18 @@
             renderProducts(filtered);
         }
 
-        // Gniotkomat - Losowanie z dźwiękiem Web Audio API
+        // Gniotkomat - Losowanie (Szansa ok. 1 na 30, limit 3 prób)
         const emojis = ["🐱", "🐰", "🐼", "🦄", "🍑", "🍓", "🐙", "🐸"];
         function spinMachine() {
-            spinCount++;
+            if (userAttempts >= maxAttempts) return;
+
+            userAttempts++;
+            localStorage.setItem('gniotkomat_attempts', userAttempts);
+            updateAttemptsUI();
+
             const drum = document.getElementById('drumEmoji');
             const alertBox = document.getElementById('prizeAlert');
             let counter = 0;
-            
-            // Prosty syntezator dźwięku klikania bębna
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300 + spinCount*50, ctx.currentTime);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.1);
-            } catch(e) {}
 
             alertBox.innerHTML = "Maszyna losuje Twój gniotek... 🌀";
 
@@ -773,13 +826,25 @@
                 counter++;
                 if(counter > 15) {
                     clearInterval(interval);
-                    // Nagrody ustawione tak, żeby po 2-3 razie dać rabat
-                    if(spinCount === 1) {
-                        alertBox.innerHTML = "🎉 Wylosowano kod na **Darmową Dostawę**! Użyj kodu: <b style='color:var(--primary);'>FREESHIP</b>";
-                    } else if(spinCount === 2) {
-                        alertBox.innerHTML = "✨ Wylosowano **15% zniżki**! Użyj kodu: <b style='color:var(--primary);'>GNIOTEK15</b>";
+                    
+                    // Szansa ok. 1 na 30 (losowanie liczby od 1 do 30)
+                    // (Dla testów możesz zmienić '30' na '2' żeby wygrać od razu!)
+                    const winChance = Math.floor(Math.random() * 30) + 1;
+
+                    if(winChance === 1) {
+                        // Wygrana! Losujemy co wygrał (zniżka lub darmowa dostawa)
+                        if(Math.random() > 0.5) {
+                            alertBox.innerHTML = "🎉 NIESAMOWITE! Wylosowano **15% zniżki**! Kod: <b style='color:var(--primary);'>GNIOTEK15</b>";
+                        } else {
+                            alertBox.innerHTML = "🚚 BRAWO! Wylosowano **Darmową Dostawę**! Kod: <b style='color:var(--primary);'>FREESHIP</b>";
+                        }
                     } else {
-                        alertBox.innerHTML = "💖 Super! Wylosowano kod **15% zniżki**: <b style='color:var(--primary);'>GNIOTEK15</b>";
+                        // Przegrana w tej próbie
+                        if(userAttempts < maxAttempts) {
+                            alertBox.innerHTML = "🥺 Tym razem nic nie wylosowano! Spróbuj ponownie. (Próba " + userAttempts + "/3)";
+                        } else {
+                            alertBox.innerHTML = "😢 Wykorzystano wszystkie 3 próby. Może następnym razem!";
+                        }
                     }
                 }
             }, 80);
@@ -882,7 +947,6 @@
             document.getElementById('contactMsg').value = '';
         }
 
-        // Inicjalizacja startowa
         renderProducts(products);
     </script>
 </body>
